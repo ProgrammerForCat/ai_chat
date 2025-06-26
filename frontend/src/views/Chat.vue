@@ -59,7 +59,8 @@
             :class="['message', message.role]"
           >
             <div class="message-content">
-              {{ message.content }}
+              <div v-if="message.role === 'assistant'" v-html="renderMarkdown(message.content)"></div>
+              <div v-else>{{ message.content }}</div>
             </div>
             <div class="message-time">
               {{ formatTime(message.created_at) }}
@@ -93,6 +94,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { marked } from 'marked'
 
 export default {
   name: 'Chat',
@@ -212,6 +214,14 @@ export default {
         if (container) {
           container.scrollTop = container.scrollHeight
         }
+      })
+    },
+    
+    renderMarkdown(content) {
+      if (!content) return ''
+      return marked(content, {
+        breaks: true,
+        gfm: true
       })
     }
   }
@@ -405,6 +415,86 @@ export default {
   background: #f7fafc;
   color: #2d3748;
   border: 1px solid #e2e8f0;
+}
+
+.message-content h1,
+.message-content h2,
+.message-content h3 {
+  margin: 12px 0 8px 0;
+  color: #2d3748;
+}
+
+.message-content h1 {
+  font-size: 1.2em;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 4px;
+}
+
+.message-content h2 {
+  font-size: 1.1em;
+}
+
+.message-content h3 {
+  font-size: 1.05em;
+}
+
+.message-content code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85em;
+  color: #e53e3e;
+}
+
+.message-content pre {
+  background: #2d3748;
+  color: #f7fafc;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.message-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.9em;
+}
+
+.message-content strong {
+  font-weight: 600;
+}
+
+.message-content em {
+  font-style: italic;
+}
+
+.message-content a {
+  color: #4299e1;
+  text-decoration: none;
+}
+
+.message-content a:hover {
+  text-decoration: underline;
+}
+
+.message-content ul,
+.message-content ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.message-content li {
+  margin: 2px 0;
+}
+
+.message-content blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #718096;
 }
 
 .message-time {

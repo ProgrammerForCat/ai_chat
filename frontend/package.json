@@ -8,11 +8,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^1.4.0",
+    "marked": "^15.0.12",
+    "naive-ui": "^2.39.0",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0",
-    "vuex": "^4.1.0",
-    "axios": "^1.4.0",
-    "naive-ui": "^2.39.0"
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "~5.0.0",
