@@ -18,32 +18,26 @@ end
 # Database setup FIRST
 DB = Sequel.connect(ENV['DATABASE_URL'] || 'postgres://postgres:password@db:5432/ai_chat_development')
 
-# Create UUID extension if not exists
-begin
-  DB.run 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
-rescue => e
-  puts "UUID extension already exists or couldn't be created: #{e.message}"
-end
 
 # Create tables if they don't exist
 DB.create_table? :users do
-  String :id, primary_key: true, default: Sequel.function(:gen_random_uuid)
+  primary_key :id, type: :Bignum
   String :email, null: false, unique: true
   String :password_digest, null: false
   DateTime :created_at, default: Sequel::CURRENT_TIMESTAMP
 end
 
 DB.create_table? :conversations do
-  String :id, primary_key: true, default: Sequel.function(:gen_random_uuid)
-  foreign_key :user_id, :users, type: String, null: false
+  primary_key :id, type: :Bignum
+  foreign_key :user_id, :users, null: false
   String :specialist_type, null: false
   String :title
   DateTime :created_at, default: Sequel::CURRENT_TIMESTAMP
 end
 
 DB.create_table? :messages do
-  String :id, primary_key: true, default: Sequel.function(:gen_random_uuid)
-  foreign_key :conversation_id, :conversations, type: String, null: false
+  primary_key :id, type: :Bignum
+  foreign_key :conversation_id, :conversations, null: false
   String :role, null: false
   Text :content, null: false
   DateTime :created_at, default: Sequel::CURRENT_TIMESTAMP

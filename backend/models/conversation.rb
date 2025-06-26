@@ -4,9 +4,6 @@ class Conversation < Sequel::Model
   plugin :validation_helpers
   plugin :timestamps, update_on_create: true
   
-  # Set primary key to UUID string
-  set_primary_key :id
-  unrestrict_primary_key
   
   many_to_one :user
   one_to_many :messages, order: :created_at

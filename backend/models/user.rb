@@ -5,9 +5,6 @@ class User < Sequel::Model
   plugin :validation_helpers
   plugin :timestamps, update_on_create: true
   
-  # Set primary key to UUID string
-  set_primary_key :id
-  unrestrict_primary_key
   
   one_to_many :conversations
   
