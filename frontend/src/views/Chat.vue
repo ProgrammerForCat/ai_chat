@@ -232,7 +232,17 @@ export default {
     
     getSpecialistName(type) {
       const specialist = this.specialists.find(s => s.id === type)
-      return specialist ? specialist.name : type
+      if (specialist) {
+        return specialist.name
+      }
+      
+      // Legacy mappings
+      const legacyMappings = {
+        'lawyer': '法律アドバイザー',
+        'career_consultant': 'キャリアアドバイザー'
+      }
+      
+      return legacyMappings[type] || type
     },
     
     formatDate(dateString) {
