@@ -96,6 +96,7 @@ const actions = {
   },
   
   async sendMessage({ commit }, { conversationId, content }) {
+    commit('SET_LOADING', true)
     try {
       const response = await api.post(`/api/v1/conversations/${conversationId}/messages`, {
         message: { content }
@@ -106,6 +107,8 @@ const actions = {
       const message = error.response?.data?.errors?.join(', ') || 'Failed to send message'
       commit('SET_ERROR', message)
       return { success: false, error: message }
+    } finally {
+      commit('SET_LOADING', false)
     }
   },
   

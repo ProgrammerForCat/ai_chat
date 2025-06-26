@@ -63,7 +63,27 @@
               <div v-else>{{ message.content }}</div>
             </div>
             <div class="message-time">
-              {{ formatTime(message.created_at) }}
+              {{ formatDateTime(message.created_at) }}
+            </div>
+          </div>
+          
+          <!-- 送信中のメッセージ -->
+          <div v-if="pendingMessage" class="message user">
+            <div class="message-content">
+              {{ pendingMessage }}
+            </div>
+            <div class="message-time">
+              {{ formatDateTime(new Date().toISOString()) }}
+            </div>
+          </div>
+          
+          <!-- ローディングスピナー -->
+          <div v-if="loading && pendingMessage" class="message assistant">
+            <div class="message-content loading-content">
+              <div class="loading-spinner">
+                <div class="spinner"></div>
+                <span>返答を生成中...</span>
+              </div>
             </div>
           </div>
         </div>
@@ -73,11 +93,12 @@
             <input
               v-model="newMessage"
               @keyup.enter="handleSendMessage"
-              placeholder="メッセージを入力..."
+              :placeholder="loading ? '返答を待っています...' : 'メッセージを入力...'"
               :disabled="loading"
             />
             <button @click="handleSendMessage" :disabled="loading || !newMessage.trim()">
-              送信
+              <span v-if="loading">送信中...</span>
+              <span v-else>送信</span>
             </button>
           </div>
         </div>
@@ -101,7 +122,8 @@ export default {
   data() {
     return {
       showSelector: false,
-      newMessage: ''
+      newMessage: '',
+      pendingMessage: null
     }
   },
   computed: {
@@ -165,25 +187,37 @@ export default {
     },
     
     async handleSendMessage() {
-      if (!this.newMessage.trim() || !this.currentConversation) return
+      if (!this.newMessage.trim() || !this.currentConversation || this.loading) return
+      
+      const messageContent = this.newMessage.trim()
+      this.newMessage = ''
+      this.pendingMessage = messageContent
+      
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
       
       try {
         const result = await this.sendMessage({
           conversationId: this.currentConversation.id,
-          content: this.newMessage.trim()
+          content: messageContent
         })
         
+        this.pendingMessage = null
+        
         if (result.success) {
-          this.newMessage = ''
           this.$nextTick(() => {
             this.scrollToBottom()
           })
           await this.fetchConversations()
         } else {
           console.error('Send message failed:', result.error)
+          this.newMessage = messageContent
         }
       } catch (error) {
         console.error('Send message error:', error)
+        this.newMessage = messageContent
+        this.pendingMessage = null
       }
     },
     
@@ -203,6 +237,16 @@ export default {
     
     formatTime(dateString) {
       return new Date(dateString).toLocaleTimeString('ja-JP', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    },
+    
+    formatDateTime(dateString) {
+      return new Date(dateString).toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
         hour: '2-digit',
         minute: '2-digit'
       })
@@ -495,6 +539,37 @@ export default {
   padding-left: 12px;
   margin: 8px 0;
   color: #718096;
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e2e8f0;
+  border-top: 2px solid #4299e1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner span {
+  color: #718096;
+  font-size: 14px;
 }
 
 .message-time {
