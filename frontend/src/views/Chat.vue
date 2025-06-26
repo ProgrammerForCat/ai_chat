@@ -183,7 +183,11 @@ export default {
     async selectConversation(conversationId) {
       this.showSelector = false
       await this.loadConversation(conversationId)
-      this.scrollToBottom()
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.scrollToBottom()
+        }, 500)
+      })
     },
     
     async handleSendMessage() {
@@ -206,10 +210,10 @@ export default {
         this.pendingMessage = null
         
         if (result.success) {
-          this.$nextTick(() => {
-            this.scrollToBottom()
-          })
           await this.fetchConversations()
+          setTimeout(() => {
+            this.scrollToBottom()
+          }, 500)
         } else {
           console.error('Send message failed:', result.error)
           this.newMessage = messageContent
@@ -253,12 +257,10 @@ export default {
     },
     
     scrollToBottom() {
-      this.$nextTick(() => {
-        const container = this.$refs.messagesContainer
-        if (container) {
-          container.scrollTop = container.scrollHeight
-        }
-      })
+      const container = this.$refs.messagesContainer
+      if (container) {
+        container.scrollTop = container.scrollHeight
+      }
     },
     
     renderMarkdown(content) {
@@ -410,6 +412,8 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .chat-header {
@@ -426,7 +430,8 @@ export default {
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 20px 40px;
+  min-height: 0;
 }
 
 .message {
@@ -441,11 +446,12 @@ export default {
 
 .message.assistant {
   align-items: flex-start;
+  margin-left: 20px;
 }
 
 .message-content {
-  max-width: 70%;
-  padding: 12px 16px;
+  max-width: 85%;
+  padding: 16px 20px 16px 28px;
   border-radius: 12px;
   word-wrap: break-word;
 }
