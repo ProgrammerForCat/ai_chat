@@ -282,39 +282,47 @@ export default {
 
 .sidebar {
   width: 300px;
-  background: #2d3748;
-  color: white;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  color: #2d3748;
   display: flex;
   flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid #4a5568;
+  border-bottom: 1px solid #bbdefb;
 }
 
 .new-chat-btn, .logout-btn {
   width: 100%;
   padding: 12px;
   margin-bottom: 10px;
-  background: #4299e1;
-  color: white;
+  background: linear-gradient(135deg, #90caf9 0%, #a5d6a7 100%);
+  color: #1976d2;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .logout-btn {
-  background: #e53e3e;
+  background: linear-gradient(135deg, #ffcdd2 0%, #f8bbd9 100%);
+  color: #c62828;
 }
 
 .new-chat-btn:hover {
-  background: #3182ce;
+  background: linear-gradient(135deg, #81c784 0%, #64b5f6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .logout-btn:hover {
-  background: #c53030;
+  background: linear-gradient(135deg, #f48fb1 0%, #ffab91 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .conversations-list {
@@ -324,29 +332,38 @@ export default {
 }
 
 .conversation-item {
-  padding: 12px;
+  padding: 14px;
   margin-bottom: 8px;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .conversation-item:hover {
-  background: #4a5568;
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .conversation-item.active {
-  background: #4299e1;
+  background: linear-gradient(135deg, #bbdefb 0%, #e1bee7 100%);
+  border: 1px solid #90caf9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .conversation-title {
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 4px;
+  color: #1976d2;
 }
 
 .conversation-meta {
   font-size: 12px;
-  color: #a0aec0;
+  color: #5c6bc0;
+  opacity: 0.8;
 }
 
 .main-content {
