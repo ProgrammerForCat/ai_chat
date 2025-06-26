@@ -1,0 +1,14 @@
+source 'https://rubygems.org'
+
+ruby '3.2.3'
+
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'pg'
+gem 'sequel'
+gem 'bcrypt'
+gem 'jwt'
+gem 'httparty'
+gem 'rack-cors'
+gem 'sinatra-cross_origin'
+gem 'puma'

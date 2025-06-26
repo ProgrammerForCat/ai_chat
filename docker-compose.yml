@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/ai_chat_development
+      RAILS_ENV: development
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    volumes:
+      - ./backend:/app
+      - /app/vendor/bundle
+    command: >
+      sh -c "
+        bundle install &&
+        bundle exec ruby app.rb -o 0.0.0.0 -p 3000
+      "
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ai_chat_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  frontend:
+    image: node:18
+    working_dir: /app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app
+    command: >
+      sh -c "
+        npm install -g @vue/cli &&
+        if [ ! -f package.json ]; then
+          vue create . --default --packageManager npm --force
+        fi &&
+        npm install &&
+        npm run serve -- --host 0.0.0.0
+      "
+
+volumes:
+  postgres_data:
