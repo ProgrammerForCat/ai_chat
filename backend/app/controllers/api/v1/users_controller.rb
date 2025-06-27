@@ -6,11 +6,11 @@ class Api::V1::UsersController < ApplicationController
   end
   
   def update_profile
-    if params[:username].present?
+    if params.key?(:username)
       current_user.username = params[:username]
     end
     
-    if params[:gemini_api_key].present?
+    if params.key?(:gemini_api_key)
       current_user.gemini_api_key = params[:gemini_api_key]
     end
     
