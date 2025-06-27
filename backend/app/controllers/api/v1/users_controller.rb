@@ -1,0 +1,26 @@
+class Api::V1::UsersController < ApplicationController
+  before_action :require_authentication
+  
+  def profile
+    render json: { user: current_user.to_json_safe }
+  end
+  
+  def update_profile
+    if params[:username].present?
+      current_user.username = params[:username]
+    end
+    
+    if params[:gemini_api_key].present?
+      current_user.gemini_api_key = params[:gemini_api_key]
+    end
+    
+    if current_user.save
+      render json: { success: true, user: current_user.to_json_safe }
+    else
+      render json: { success: false, errors: current_user.errors.full_messages }, status: :bad_request
+    end
+  rescue => e
+    Rails.logger.error "Error updating profile: #{e.message}"
+    render json: { success: false, errors: ['Failed to update profile'] }, status: :internal_server_error
+  end
+end
