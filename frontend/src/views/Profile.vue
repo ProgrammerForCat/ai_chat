@@ -32,7 +32,7 @@
           />
         </n-form-item>
       </n-form>
-      
+
       <template #action>
         <n-space>
           <n-button
@@ -48,9 +48,58 @@
           <n-button @click="goBack">
             戻る
           </n-button>
+          <n-button
+            type="warning"
+            @click="showPasswordModal = true"
+          >
+            パスワードを変更
+          </n-button>
         </n-space>
       </template>
     </n-card>
+
+    <n-modal
+      v-model:show="showPasswordModal"
+      preset="dialog"
+      title="パスワードの変更"
+      positive-text="変更"
+      negative-text="キャンセル"
+      @positive-click="handlePasswordUpdate"
+      @negative-click="showPasswordModal = false"
+    >
+      <n-form
+        ref="passwordFormRef"
+        :model="passwordFormData"
+        :rules="passwordRules"
+        label-placement="left"
+        label-width="120px"
+      >
+        <n-form-item label="現在のパスワード" path="current_password">
+          <n-input
+            v-model:value="passwordFormData.current_password"
+            type="password"
+            show-password-on="click"
+            placeholder="現在のパスワード"
+          />
+        </n-form-item>
+        <n-form-item label="新しいパスワード" path="new_password">
+          <n-input
+            v-model:value="passwordFormData.new_password"
+            type="password"
+            show-password-on="click"
+            placeholder="新しいパスワード"
+          />
+        </n-form-item>
+        <n-form-item label="新しいパスワード(確認)" path="new_password_confirmation">
+          <n-input
+            v-model:value="passwordFormData.new_password_confirmation"
+            type="password"
+            show-password-on="click"
+            placeholder="新しいパスワードを再入力"
+          />
+        </n-form-item>
+      </n-form>
+    </n-modal>
   </div>
 </template>
 
@@ -68,7 +117,9 @@ export default {
     const router = useRouter()
     const message = useMessage()
     const formRef = ref()
+    const passwordFormRef = ref()
     const loading = ref(false)
+    const showPasswordModal = ref(false)
     
     const formData = reactive({
       email: '',
@@ -76,6 +127,12 @@ export default {
       gemini_api_key: ''
     })
     
+    const passwordFormData = reactive({
+      current_password: '',
+      new_password: '',
+      new_password_confirmation: ''
+    })
+
     const originalData = reactive({
       email: '',
       username: '',
@@ -94,6 +151,40 @@ export default {
         {
           required: false,
           message: 'Gemini APIキーを入力してください',
+          trigger: ['input', 'blur']
+        }
+      ]
+    }
+
+    const passwordRules = {
+      current_password: [
+        {
+          required: true,
+          message: '現在のパスワードを入力してください',
+          trigger: ['input', 'blur']
+        }
+      ],
+      new_password: [
+        {
+          required: true,
+          message: '新しいパスワードを入力してください',
+          trigger: ['input', 'blur']
+        },
+        {
+          min: 6,
+          message: 'パスワードは6文字以上である必要があります',
+          trigger: ['input', 'blur']
+        }
+      ],
+      new_password_confirmation: [
+        {
+          required: true,
+          message: '新しいパスワードを再入力してください',
+          trigger: ['input', 'blur']
+        },
+        {
+          validator: (rule, value) => value === passwordFormData.new_password,
+          message: '新しいパスワードと確認用パスワードが一致しません',
           trigger: ['input', 'blur']
         }
       ]
@@ -151,6 +242,37 @@ export default {
       formData.username = originalData.username
       formData.gemini_api_key = originalData.gemini_api_key
     }
+
+    const handlePasswordUpdate = async () => {
+      try {
+        await passwordFormRef.value?.validate()
+        loading.value = true
+
+        const updateData = {
+          current_password: passwordFormData.current_password,
+          new_password: passwordFormData.new_password,
+          new_password_confirmation: passwordFormData.new_password_confirmation
+        }
+
+        await api.put('/api/v1/users/password', updateData)
+
+        message.success('パスワードを更新しました')
+        showPasswordModal.value = false
+        // Clear password fields after successful update
+        passwordFormData.current_password = ''
+        passwordFormData.new_password = ''
+        passwordFormData.new_password_confirmation = ''
+      } catch (error) {
+        console.error('パスワード更新エラー:', error)
+        if (error.response?.data?.errors) {
+          message.error(error.response.data.errors.join(', '))
+        } else {
+          message.error('パスワードの更新に失敗しました')
+        }
+      } finally {
+        loading.value = false
+      }
+    }
     
     const goBack = () => {
       router.push('/')
@@ -167,7 +289,12 @@ export default {
       loading,
       handleUpdate,
       handleReset,
-      goBack
+      goBack,
+      passwordFormRef,
+      passwordFormData,
+      passwordRules,
+      handlePasswordUpdate,
+      showPasswordModal
     }
   }
 }

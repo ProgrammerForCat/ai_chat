@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       # User routes
       get 'users/profile', to: 'users#profile'
       put 'users/profile', to: 'users#update_profile'
+      put 'users/password', to: 'users#update_password'
       
       # Conversation routes
       resources :conversations, only: [:index, :show, :create] do
