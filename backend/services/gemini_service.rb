@@ -1,13 +1,17 @@
 require 'httparty'
 
 class GeminiService
-  def initialize(specialist_type)
+  def initialize(specialist_type, api_key = nil)
     @specialist_type = specialist_type
-    @api_key = ENV['GEMINI_API_KEY']
+    @api_key = api_key || ENV['GEMINI_API_KEY']
     @api_url = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent"
   end
   
   def generate_response(messages)
+    unless @api_key
+      return "申し訳ございません。Gemini APIキーが設定されていません。プロフィール画面でAPIキーを設定してください。"
+    end
+    
     system_prompt = get_system_prompt(@specialist_type)
     formatted_contents = format_messages(messages, system_prompt)
     

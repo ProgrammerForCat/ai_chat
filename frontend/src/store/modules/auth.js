@@ -11,7 +11,8 @@ const getters = {
   isAuthenticated: state => !!state.token,
   user: state => state.user,
   loading: state => state.loading,
-  error: state => state.error
+  error: state => state.error,
+  hasGeminiApiKey: state => !!(state.user && state.user.gemini_api_key)
 }
 
 const mutations = {
@@ -99,6 +100,17 @@ const actions = {
   initializeAuth({ commit, state }) {
     if (state.token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${state.token}`
+    }
+  },
+  
+  async fetchUserProfile({ commit }) {
+    try {
+      const response = await api.get('/api/v1/users/profile')
+      commit('SET_USER', response.data.user)
+      return { success: true }
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error)
+      return { success: false, error: error.message }
     }
   }
 }

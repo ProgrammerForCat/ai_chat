@@ -52,6 +52,7 @@ require_relative 'models/message'
 require_relative 'controllers/auth_controller'
 require_relative 'controllers/conversations_controller'
 require_relative 'controllers/messages_controller'
+require_relative 'controllers/users_controller'
 
 # Load services
 require_relative 'services/gemini_service'
@@ -241,6 +242,45 @@ post '/api/v1/conversations/:conversation_id/messages' do
   else
     status 400
     json({ errors: result[:errors] })
+  end
+end
+
+# User profile routes
+get '/api/v1/users/profile' do
+  content_type :json
+  current_user = authenticate_user
+  
+  json({ user: current_user.to_json_safe })
+end
+
+put '/api/v1/users/profile' do
+  content_type :json
+  current_user = authenticate_user
+  
+  begin
+    data = JSON.parse(request.body.read)
+    
+    if data['username']
+      current_user.username = data['username']
+    end
+    
+    if data['gemini_api_key']
+      current_user.gemini_api_key = data['gemini_api_key']
+    end
+    
+    current_user.save
+    
+    json({ success: true, user: current_user.to_json_safe })
+  rescue JSON::ParserError
+    status 400
+    json({ error: 'Invalid JSON' })
+  rescue Sequel::ValidationFailed => e
+    status 400
+    json({ error: e.message })
+  rescue => e
+    puts "Error updating profile: #{e.message}"
+    status 500
+    json({ error: 'Internal server error' })
   end
 end
 

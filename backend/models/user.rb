@@ -24,10 +24,18 @@ class User < Sequel::Model
   end
   
   def to_json_safe
-    {
+    result = {
       id: id,
       email: email,
       created_at: created_at
     }
+    
+    # Add username if column exists
+    result[:username] = self[:username] if columns.include?(:username)
+    
+    # Add gemini_api_key if column exists
+    result[:gemini_api_key] = self[:gemini_api_key] if columns.include?(:gemini_api_key)
+    
+    result
   end
 end

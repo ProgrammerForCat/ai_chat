@@ -22,7 +22,7 @@ class MessagesController
       { role: msg.role, content: msg.content }
     end
     
-    gemini_service = GeminiService.new(conversation.specialist_type)
+    gemini_service = GeminiService.new(conversation.specialist_type, user.gemini_api_key)
     ai_response = gemini_service.generate_response(messages_for_ai)
     
     # Save AI response

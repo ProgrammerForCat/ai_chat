@@ -1,12 +1,19 @@
 <template>
   <div id="app">
-    <router-view />
+    <n-message-provider>
+      <router-view />
+    </n-message-provider>
   </div>
 </template>
 
 <script>
+import { NMessageProvider } from 'naive-ui'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    NMessageProvider
+  }
 }
 </script>
 

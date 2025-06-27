@@ -6,6 +6,9 @@
         <button @click="showSpecialistSelector" class="new-chat-btn">
           + 新しい相談
         </button>
+        <button @click="goToProfile" class="profile-btn">
+          設定
+        </button>
         <button @click="handleLogout" class="logout-btn">
           ログアウト
         </button>
@@ -29,8 +32,19 @@
     
     <!-- Main Chat Area -->
     <div class="main-content">
+      <!-- API Key Warning -->
+      <div v-if="!hasGeminiApiKey" class="api-key-warning">
+        <div class="warning-content">
+          <h2>🔑 Gemini APIキーが設定されていません</h2>
+          <p>チャット機能を使用するには、Gemini APIキーの設定が必要です。</p>
+          <button @click="goToProfile" class="setup-btn">
+            APIキーを設定する
+          </button>
+        </div>
+      </div>
+      
       <!-- Specialist Selector -->
-      <div v-if="showSelector" class="specialist-selector">
+      <div v-else-if="showSelector" class="specialist-selector">
         <h2>どの専門家に相談しますか？</h2>
         <div class="specialists-grid">
           <div
@@ -127,7 +141,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('auth', ['user']),
+    ...mapGetters('auth', ['user', 'hasGeminiApiKey']),
     ...mapGetters('chat', [
       'conversations',
       'currentConversation',
@@ -146,7 +160,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('auth', ['logout', 'initializeAuth']),
+    ...mapActions('auth', ['logout', 'initializeAuth', 'fetchUserProfile']),
     ...mapActions('chat', [
       'fetchSpecialists',
       'fetchConversations',
@@ -159,7 +173,8 @@ export default {
     async loadData() {
       await Promise.all([
         this.fetchSpecialists(),
-        this.fetchConversations()
+        this.fetchConversations(),
+        this.fetchUserProfile()
       ])
     },
     
@@ -228,6 +243,10 @@ export default {
     async handleLogout() {
       await this.logout()
       this.$router.push('/login')
+    },
+    
+    goToProfile() {
+      this.$router.push('/profile')
     },
     
     getSpecialistName(type) {
@@ -304,7 +323,7 @@ export default {
   border-bottom: 1px solid #bbdefb;
 }
 
-.new-chat-btn, .logout-btn {
+.new-chat-btn, .profile-btn, .logout-btn {
   width: 100%;
   padding: 12px;
   margin-bottom: 10px;
@@ -323,7 +342,7 @@ export default {
   color: #c62828;
 }
 
-.new-chat-btn:hover {
+.new-chat-btn:hover, .profile-btn:hover {
   background: linear-gradient(135deg, #81c784 0%, #64b5f6 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -598,6 +617,56 @@ export default {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.api-key-warning {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.warning-content {
+  text-align: center;
+  max-width: 500px;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 2px solid #ffc107;
+}
+
+.warning-content h2 {
+  margin-bottom: 16px;
+  color: #856404;
+  font-size: 24px;
+}
+
+.warning-content p {
+  margin-bottom: 24px;
+  color: #6c5700;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.setup-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.setup-btn:hover {
+  background: linear-gradient(135deg, #ffb300 0%, #ff8f00 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
 }
 
 .loading-spinner span {
