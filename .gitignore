@@ -14,6 +14,7 @@ backend/.DS_Store
 backend/.env
 backend/.env.local
 backend/.env.*.local
+backend/config/master.key
 
 # Frontend (Vue.js)
 frontend/node_modules/
