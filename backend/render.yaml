@@ -3,7 +3,6 @@ services:
     name: ai-chat-backend
     runtime: ruby
     plan: free
-    rootDir: backend
     buildCommand: bundle install && bundle exec rails db:create db:migrate
     startCommand: bundle exec rails server -b 0.0.0.0 -p $PORT
     envVars:
