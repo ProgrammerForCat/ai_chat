@@ -7,10 +7,13 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins "*"
+    origins Rails.env.production? ? 
+      [Rails.application.credentials.frontend&.[](:url) || ENV['FRONTEND_URL'] || 'https://your-app.pages.dev'] : 
+      ['http://localhost:8080', 'http://127.0.0.1:8080']
 
     resource "*",
       headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head]
+      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      credentials: true
   end
 end
