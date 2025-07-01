@@ -15,7 +15,7 @@ development:
   username: postgres
   password: password
   host: localhost
-
+ 
 test:
   <<: *default
   database: ai_chat_test
